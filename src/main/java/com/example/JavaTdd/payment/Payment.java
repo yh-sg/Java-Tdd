@@ -3,11 +3,19 @@ package com.example.JavaTdd.payment;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 import lombok.Getter;
 import lombok.Setter;
 
+@Entity
 @Getter @Setter
 public class Payment {
+	
+	@Id
+	@GeneratedValue
 	private Long paymentId;
 
     private UUID customerId;
