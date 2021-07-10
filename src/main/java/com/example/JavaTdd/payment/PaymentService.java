@@ -19,9 +19,13 @@ public class PaymentService {
 	@Autowired
 	private PaymentRepository paymentRepository;
 	
-	public PaymentService(CustomerRepository customerRepository, PaymentRepository paymentRepository) {
+	@Autowired
+	private CardPaymentCharger cardPaymentCharger;
+	
+	public PaymentService(CustomerRepository customerRepository, PaymentRepository paymentRepository, CardPaymentCharger cardPaymentCharger) {
 		this.customerRepository = customerRepository;
 		this.paymentRepository = paymentRepository;
+		this.cardPaymentCharger = cardPaymentCharger;
 	}
 	
 	public void chargeCard(UUID customerId, PaymentRequest paymentRequest) {
@@ -39,6 +43,21 @@ public class PaymentService {
 		}
 		
 		//Charge card
+		CardPaymentCharge cardPaymentCharge = 
+				cardPaymentCharger
+					.chargeCard
+					(
+						customerId, 
+						paymentRequest.getPayment().getAmount(), 
+						checkCurrency, 
+						paymentRequest.getPayment().getDescription()
+					);
+		
+		if(!cardPaymentCharge.isCardDebited()) {
+			throw new IllegalStateException("Card not debited for customer " + customerId);
+		}
 		//Insert payment?
+		paymentRequest.getPayment().setCustomerId(customerId);
+		paymentRepository.save(paymentRequest.getPayment());
 	}
 }
