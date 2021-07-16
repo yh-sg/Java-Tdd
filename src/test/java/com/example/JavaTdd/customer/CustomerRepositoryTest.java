@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest(
 	properties = {
@@ -54,26 +56,42 @@ public class CustomerRepositoryTest {
 	}
 	
 	@Test
-	@Disabled("Under construction")
 	void selectCustomerIfPhoneNumberExist() {
 		//Given
+		UUID id = UUID.randomUUID();
+		Customer customer = new Customer(id, "Nagisa", "112233");
 		//When
+		customerRepository.save(customer);
 		//Then
+		Optional<Customer> selectPhoneCustomer = customerRepository.selectCustomerByPhoneNumber("112233");
+		assertThat(selectPhoneCustomer)
+			.isPresent()
+			.hasValueSatisfying(c->{
+				assertThat(c).isEqualToComparingFieldByField(customer);
+			});
 	}
 	
 	@Test
-	@Disabled("Under construction")
 	void shouldNotSaveWhenNameIsNull() {
 		//Given
+		UUID id = UUID.randomUUID();
+		Customer customer = new Customer(id, null, "999");
 		//When
 		//Then
+		assertThatThrownBy(()->customerRepository.save(customer))
+		.hasMessageStartingWith("not-null")
+		.isInstanceOf(DataIntegrityViolationException.class);
 	}
 	
 	@Test
-	@Disabled("Under construction")
 	void shouldNotSaveWhenPhoneNumIsNull() {
 		//Given
+		UUID id = UUID.randomUUID();
+		Customer customer = new Customer(id, "Sarashiki", null);
 		//When
 		//Then
+		assertThatThrownBy(()->customerRepository.save(customer))
+		.hasMessageStartingWith("not-null")
+		.isInstanceOf(DataIntegrityViolationException.class);
 	}
 }
