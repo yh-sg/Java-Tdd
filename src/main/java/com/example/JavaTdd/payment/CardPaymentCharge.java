@@ -1,7 +1,8 @@
 package com.example.JavaTdd.payment;
 
 public class CardPaymentCharge {
-	private boolean isCardDebited;
+	
+	private final boolean isCardDebited;
 	
 	public CardPaymentCharge(boolean isCardDebited) {
 		this.isCardDebited = isCardDebited;

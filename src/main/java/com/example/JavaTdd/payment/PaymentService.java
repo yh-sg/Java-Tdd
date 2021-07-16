@@ -15,10 +15,8 @@ public class PaymentService {
 	
 	@Autowired
 	private CustomerRepository customerRepository;
-	
 	@Autowired
 	private PaymentRepository paymentRepository;
-	
 	@Autowired
 	private CardPaymentCharger cardPaymentCharger;
 	

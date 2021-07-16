@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -18,7 +17,7 @@ import com.example.JavaTdd.customer.CustomerRepository;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 public class PaymentServiceTest {
@@ -41,10 +40,11 @@ public class PaymentServiceTest {
 	@InjectMocks
 	private PaymentService paymentService;
 	
+	UUID customerId = UUID.randomUUID();
+	
 	@Test
 	void chargeCardSuccessfully() {
 		//Given
-		UUID customerId = UUID.randomUUID();
 		given(customerRepository.findById(customerId)).willReturn(Optional.of(customer));
 		PaymentRequest paymentRequest = new PaymentRequest(
 				new Payment(
@@ -76,21 +76,75 @@ public class PaymentServiceTest {
 	}
 	
 	@Test
-	@Disabled("Under Construction")
-	void throwErrWhenCardIsNotCharged() {
-		
-	}
-	
-	@Test
-	@Disabled("Under Construction")
-	void throwErrWhenCurrencyIsNotSupported() {
-		
-	}
-	
-	@Test
-	@Disabled("Under Construction")
 	void throwErrWhenCustomerNotFound() {
-		
+		//given
+		given(customerRepository.findById(customerId)).willReturn(Optional.empty());
+		//when - Customer not found in db
+		assertThatThrownBy(()->paymentService.chargeCard(customerId, new PaymentRequest(new Payment())
+				)).isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("Customer does not exist!");
+		//then
+		then(cardPaymentCharger).shouldHaveNoInteractions();
+		then(paymentRepository).shouldHaveNoInteractions();
 	}
+	
+	@Test
+	void throwErrWhenCurrencyIsNotSupported() {
+		//given
+		given(customerRepository.findById(customerId)).willReturn(Optional.of(customer));
+		Currency notSupportedCurrency = Currency.EUR;
+		PaymentRequest paymentRequest = new PaymentRequest(
+				new Payment(
+			        null,
+			        null,
+			        new BigDecimal("100"),
+			        notSupportedCurrency,
+			        "visaxx123xx",
+			        "School Fee"
+				)
+			);
+		//when
+		assertThatThrownBy(()->paymentService.chargeCard(customerId, paymentRequest))
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining(notSupportedCurrency+" is not supported!");
+		//then
+		then(cardPaymentCharger).shouldHaveNoInteractions();
+		then(paymentRepository).shouldHaveNoInteractions();
+	}
+	
+	@Test
+	void throwErrWhenCardIsNotCharged() {
+		//Given
+		given(customerRepository.findById(customerId)).willReturn(Optional.of(customer));
+		PaymentRequest paymentRequest = new PaymentRequest(
+				new Payment(
+						null,
+						null,
+						new BigDecimal("100.00"),
+						Currency.JPY,
+						"visaxx123xx",
+						"School Fee"
+						)
+				);
+		
+		given(cardPaymentCharger.chargeCard(
+				customerId, 
+				paymentRequest.getPayment().getAmount(), 
+				paymentRequest.getPayment().getCurrency(), 
+				paymentRequest.getPayment().getDescription()
+			)).willReturn(new CardPaymentCharge(false));
+				
+		//When
+		assertThatThrownBy(() -> paymentService.chargeCard(customerId, paymentRequest))
+					.isInstanceOf(IllegalStateException.class)
+					.hasMessageContaining("Card not debited for customer " + customerId);
+		
+		//Then
+		then(paymentRepository).shouldHaveNoInteractions();
+	}
+	
+
+	
+
 }
 
