@@ -6,19 +6,29 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.JavaTdd.utils.PhoneNumberValidator;
+
 @Service
 public class CustomerRegistrationService {
 
 	@Autowired
 	private CustomerRepository customerRepository;
 	
-    public CustomerRegistrationService(CustomerRepository customerRepository) {
+	@Autowired
+	private PhoneNumberValidator phoneNumberValidator;
+	
+    public CustomerRegistrationService(CustomerRepository customerRepository,PhoneNumberValidator phoneNumberValidator) {
         this.customerRepository = customerRepository;
+        this.phoneNumberValidator = phoneNumberValidator;
     }
 	
     public void registerNewCustomer(CustomerRegistrationRequest request) {
     	
     	String phoneNumber = request.getCustomer().getPhoneNumber();
+    	
+    	if(!phoneNumberValidator.validate(phoneNumber)) {
+    		throw new IllegalStateException("Phone number "+phoneNumber+" is not valid"); 
+    	}
     
     	Optional<Customer> customerOptional = customerRepository.selectCustomerByPhoneNumber(phoneNumber);
     	
