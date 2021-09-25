@@ -16,7 +16,13 @@ public class ContactsManagementServiceImpl implements ContactsManagementService 
 	@Override
 	public CustomerContact add(CustomerContact addContact) {
 		
-		CustomerContact newContact = customerContactRepo.save(addContact);
+		//! This is a very bad example, by right there should be a validator util for it.
+		//! But for simple testing exercise purpose, this will do. =)
+		CustomerContact newContact = null;
+		
+		if(addContact.getFirstName()!=null) {
+			newContact = customerContactRepo.save(addContact);
+		}
 		
 		return newContact;
 	}

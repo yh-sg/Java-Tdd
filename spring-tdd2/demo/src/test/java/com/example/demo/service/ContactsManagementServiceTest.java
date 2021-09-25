@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.DisplayName;
@@ -26,17 +27,16 @@ public class ContactsManagementServiceTest {
 	@DisplayName("Integration test for @Service")
 	public void testAddContact() {
 		//given
-		CustomerContact newContact = new CustomerContact();
-		newContact.setFirstName("Rikka");
-		newContact.setLastName("Tachibana");
+		CustomerContact newContact = new CustomerContact("Rikka","Tachibana");
 		
 		//when
-		contactsManagementService.add(newContact);
+		CustomerContact resultContact = contactsManagementService.add(newContact);
 		
 		//then
 		assertNotNull(newContact);
 		assertNotNull(newContact.getId());
-		assertEquals("Rikka",newContact.getFirstName());
-		
+		assertNotEquals(resultContact.getFirstName(),"rika");
+		assertEquals(resultContact.getFirstName(),newContact.getFirstName());
 	}
+	
 }

@@ -8,11 +8,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@ToString
 @Table(name="tbl_customer_contact")
 public class CustomerContact {
 	
@@ -38,4 +42,12 @@ public class CustomerContact {
 	private String deliveryAddressState;
 	@Column(name="deliveryaddresszipcode")
 	private String deliveryAddressZipCode;
+	
+	public CustomerContact(String firstName, String lastName) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+	
+	
 }
