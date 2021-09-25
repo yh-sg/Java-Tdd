@@ -20,6 +20,9 @@ public class ContactsManagementServiceImpl implements ContactsManagementService 
 		//! But for simple testing exercise purpose, this will do. =)
 		CustomerContact newContact = null;
 		
+		System.out.println(addContact);
+		System.out.println(addContact.getFirstName());
+		
 		if(addContact.getFirstName()!=null) {
 			newContact = customerContactRepo.save(addContact);
 		}
