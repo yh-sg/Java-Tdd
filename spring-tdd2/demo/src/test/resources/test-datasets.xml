@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+	<customer_contact id="1" first_name="Kasumi" email="kasumi@landsol.com"/>
+	<customer_contact id="2" first_name="Shiori" email="nyako@landsol.com"/>
+	<customer_contact id="3" first_name="Hatsune" email="kiiran@landsol.com"/>
+	<customer_contact id="4" first_name="Kishi-Kun" email="kishi@landsol.com"/>
+</dataset>
